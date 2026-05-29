@@ -63,7 +63,7 @@ For each important dimension identified, conduct targeted research:
 
 1. **Specific Queries**: Search with precise keywords for each subtopic
 2. **Multiple Phrasings**: Try different keyword combinations and phrasings
-3. **Fetch Full Content**: Use `web_fetch` to read important sources in full, not just snippets
+3. **Fetch Full Content**: Use `playwright` to read important sources in full, not just snippets
 4. **Follow References**: When sources mention other important resources, search for those too
 
 Example:
@@ -151,9 +151,9 @@ Before proceeding to content generation, verify:
 ❌ User asks "what's new in tech today" → searching `"new technology 2026"` → misses today's news
 ✅ User asks "what's new in tech today" → searching `"new technology February 28 2026"` + `"tech news today Feb 28"` → gets today's results
 
-### When to Use web_fetch
+### When to Use playwright
 
-Use `web_fetch` to read full content when:
+Use `playwright` to read full content when:
 - A search result looks highly relevant and authoritative
 - You need detailed information beyond the snippet
 - The source contains data, case studies, or expert analysis

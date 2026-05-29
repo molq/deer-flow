@@ -416,7 +416,13 @@ def test_session_pool_tool_sync_wrapper_path_is_safe():
 
 @pytest.mark.asyncio
 async def test_http_transport_tools_not_pooled():
-    """HTTP/SSE transport tools should NOT be wrapped with the session pool."""
+    """All transport tools (including HTTP/SSE) should be wrapped with the session pool.
+
+    Previously HTTP/SSE tools were excluded from pooling due to anyio TaskGroup
+    cleanup issues (#3203). With the persistent event loop in sync.py, all
+    transports can now be safely pooled, enabling stateful MCP servers like
+    Playwright to share browser state across tool calls.
+    """
     from langchain_core.tools import StructuredTool
     from pydantic import BaseModel, Field
 
@@ -475,12 +481,11 @@ async def test_http_transport_tools_not_pooled():
     # Tool discovery is lazy: no pooled sessions are created until a wrapped tool is invoked.
     assert list(pool._entries.keys()) == []
 
-    # Verify the HTTP tool was NOT wrapped with the pool (it's the original tool).
+    # Verify both HTTP and stdio tools are wrapped with the pool.
     http_tools = [t for t in tools if t.name == "myserver_search"]
     assert len(http_tools) == 1
-    assert http_tools[0].coroutine is http_tool.coroutine
+    assert http_tools[0].coroutine is not http_tool.coroutine
 
-    # Verify the stdio tool WAS wrapped with the pool.
     stdio_tools = [t for t in tools if t.name == "playwright_navigate"]
     assert len(stdio_tools) == 1
     assert stdio_tools[0].coroutine is not stdio_tool.coroutine
